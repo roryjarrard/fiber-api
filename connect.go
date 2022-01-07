@@ -5,6 +5,8 @@ import (
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
+	"log"
 	"os"
 )
 
@@ -26,5 +28,10 @@ func connectDB() error {
 	if err != nil {
 		return err
 	}
+
+	db.Logger = logger.Default.LogMode(logger.Info)
+	log.Println("Running migrations")
+	// TODO: add migrations
+
 	return nil
 }
