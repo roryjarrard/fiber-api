@@ -5,13 +5,15 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 	"log"
+
+	"github.com/roryjarrard/fiber-api/database"
 )
 
 var db *gorm.DB
 var err error
 
 func main() {
-	err = connectDB()
+	db, err = database.ConnectDB()
 	if err != nil {
 		log.Fatal(err)
 	}
