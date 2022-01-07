@@ -3,6 +3,7 @@ package database
 import (
 	"fmt"
 	"github.com/joho/godotenv"
+	"github.com/roryjarrard/fiber-api/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -38,7 +39,17 @@ func ConnectDB() (*gorm.DB, error) {
 
 	db.Logger = logger.Default.LogMode(logger.Info)
 	log.Println("Running migrations")
-	// TODO: add migrations
+
+	runMigrations(db)
 
 	return db, nil
+}
+
+func runMigrations(db *gorm.DB) {
+	fmt.Println("running migrations...")
+	db.AutoMigrate(
+		&models.User{},
+		&models.Product{},
+		&models.Order{},
+	)
 }
