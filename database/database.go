@@ -40,16 +40,22 @@ func ConnectDB() (*gorm.DB, error) {
 	db.Logger = logger.Default.LogMode(logger.Info)
 	log.Println("Running migrations")
 
-	runMigrations(db)
+	err = runMigrations(db)
+	if err != nil {
+		return nil, err
+	}
 
 	return db, nil
 }
 
-func runMigrations(db *gorm.DB) {
-	fmt.Println("running migrations...")
-	db.AutoMigrate(
+func runMigrations(db *gorm.DB) error {
+	err := db.AutoMigrate(
 		&models.User{},
 		&models.Product{},
 		&models.Order{},
 	)
+	if err != nil {
+		return err
+	}
+	return nil
 }
