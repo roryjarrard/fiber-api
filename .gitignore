@@ -15,7 +15,7 @@
 # vendor/
 
 # air artifacts
-tmp/
+tmp
 
 # IDE
 /.idea
