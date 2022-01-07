@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 	"log"
 )
@@ -15,4 +16,12 @@ func main() {
 		log.Fatal(err)
 	}
 	fmt.Println("db connected successfully")
+
+	app := fiber.New()
+
+	app.Get("/api", func(c *fiber.Ctx) error {
+		return c.SendString("Welcome to the API")
+	})
+
+	log.Fatal(app.Listen(":1337"))
 }
