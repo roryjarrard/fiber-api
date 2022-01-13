@@ -2,11 +2,22 @@ package main
 
 import (
 	"fmt"
-	"github.com/gofiber/fiber/v2"
 	"log"
 
+	"github.com/gofiber/fiber/v2"
+
 	"github.com/roryjarrard/fiber-api/database"
+	"github.com/roryjarrard/fiber-api/routes"
 )
+
+func welcome(c *fiber.Ctx) error {
+	return c.SendString("Welcome to the API")
+}
+
+func setupRoutes(app *fiber.App) {
+	app.Get("/api", welcome)
+	app.Post("/api/users", routes.CreateUser)
+}
 
 func main() {
 	err := database.ConnectDB()
@@ -17,9 +28,7 @@ func main() {
 
 	app := fiber.New()
 
-	app.Get("/api", func(c *fiber.Ctx) error {
-		return c.SendString("Welcome to the API")
-	})
+	setupRoutes(app)
 
 	log.Fatal(app.Listen(":1337"))
 }
