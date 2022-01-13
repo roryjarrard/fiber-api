@@ -2,14 +2,21 @@ package database
 
 import (
 	"fmt"
+	"log"
+	"os"
+
 	"github.com/joho/godotenv"
 	"github.com/roryjarrard/fiber-api/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
-	"log"
-	"os"
 )
+
+type DbInstance struct {
+	Db *gorm.DB
+}
+
+var Database DbInstance
 
 func getDSN() (string, error) {
 	err := godotenv.Load()
@@ -26,15 +33,15 @@ func getDSN() (string, error) {
 	return dsn, nil
 }
 
-func ConnectDB() (*gorm.DB, error) {
+func ConnectDB() error {
 	dsn, err := getDSN()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	db.Logger = logger.Default.LogMode(logger.Info)
@@ -42,10 +49,13 @@ func ConnectDB() (*gorm.DB, error) {
 
 	err = runMigrations(db)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return db, nil
+	Database = DbInstance{
+		Db: db,
+	}
+	return nil
 }
 
 func runMigrations(db *gorm.DB) error {

@@ -3,17 +3,13 @@ package main
 import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
-	"gorm.io/gorm"
 	"log"
 
 	"github.com/roryjarrard/fiber-api/database"
 )
 
-var db *gorm.DB
-var err error
-
 func main() {
-	db, err = database.ConnectDB()
+	err := database.ConnectDB()
 	if err != nil {
 		log.Fatal(err)
 	}

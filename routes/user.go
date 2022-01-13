@@ -2,6 +2,7 @@ package routes
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/roryjarrard/fiber-api/database"
 	"github.com/roryjarrard/fiber-api/models"
 )
 
@@ -27,5 +28,8 @@ func CreateUser(c *fiber.Ctx) error {
 		return c.Status(400).JSON(err.Error())
 	}
 
-	database.Database.DB.Create(&user)
+	database.Database.Db.Create(&user)
+	responseUser := CreateResponseUser(user)
+
+	return c.Status(201).JSON(responseUser)
 }
