@@ -49,3 +49,9 @@ func GetUsers(c *fiber.Ctx) error {
 
 	return c.Status(200).JSON(responseUsers)
 }
+
+func GetUser(c *fiber.Ctx) error {
+	// var user models.User
+	id := c.Params("userId")
+	return c.Status(200).JSON(id)
+}
