@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"errors"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -46,9 +47,50 @@ func CreateOrder(c *fiber.Ctx) error {
 	return c.Status(201).JSON(responseOrder)
 }
 
-func GetOrders(c *fiber.Ctx) error { return nil }
+func GetOrders(c *fiber.Ctx) error {
+	orders := []models.Order{}
+	database.Database.Db.Find(&orders)
+	responseOrders := []Order{}
 
-func GetOrder(c *fiber.Ctx) error { return nil }
+	for _, order := range orders {
+		var user models.User
+		var product models.Product
+
+		database.Database.Db.Find(&user, "id = ?", order.UserRef)
+		database.Database.Db.Find(&product, "id = ?", order.ProductRef)
+		responseOrders = append(responseOrders, CreateResponseOrder(order, CreateResponseUser(user), CreateResponseProduct(product)))
+	}
+
+	return c.Status(200).JSON(responseOrders)
+}
+
+func findOrder(id int, order *models.Order) error {
+	database.Database.Db.Find(&order, "id = ?", id)
+	if order.ID == 0 {
+		return errors.New("order does not exist")
+	}
+	return nil
+}
+
+func GetOrder(c *fiber.Ctx) error {
+	order := models.Order{}
+	user := models.User{}
+	product := models.Product{}
+
+	id, err := c.ParamsInt("orderId")
+	if err != nil {
+		return c.Status(400).JSON("provide an integer value")
+	}
+
+	if err := findOrder(id, &order); err != nil {
+		return c.Status(404).JSON(err.Error())
+	}
+	findUser(order.UserRef, &user)
+	findProduct(order.ProductRef, &product)
+
+	responseOrder := CreateResponseOrder(order, CreateResponseUser(user), CreateResponseProduct(product))
+	return c.Status(200).JSON(responseOrder)
+}
 
 func UpdateOrder(c *fiber.Ctx) error { return nil }
 
