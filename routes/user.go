@@ -61,7 +61,6 @@ func findUser(id int, user *models.User) error {
 }
 
 func GetUser(c *fiber.Ctx) error {
-	// var user models.User
 	id, err := c.ParamsInt("userId")
 
 	var user models.User
@@ -74,6 +73,42 @@ func GetUser(c *fiber.Ctx) error {
 		return c.Status(400).JSON(err.Error())
 	}
 
+	responseUser := CreateResponseUser(user)
+	return c.Status(200).JSON(responseUser)
+}
+
+func UpdateUser(c *fiber.Ctx) error {
+	id, err := c.ParamsInt("userId")
+
+	var user models.User
+
+	if err != nil {
+		return c.Status(400).JSON("Please ensure that :userId is an integer")
+	}
+
+	if err := findUser(id, &user); err != nil {
+		return c.Status(400).JSON(err.Error())
+	}
+
+	type UpdateUser struct {
+		FirstName string `json:"first_name"`
+		LastName  string `json:"last_name"`
+	}
+	var updateData UpdateUser
+
+	if err := c.BodyParser(&updateData); err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
+
+	if updateData.FirstName != "" {
+		user.FirstName = updateData.FirstName
+	}
+
+	if updateData.LastName != "" {
+		user.LastName = updateData.LastName
+	}
+
+	database.Database.Db.Save(&user)
 	responseUser := CreateResponseUser(user)
 	return c.Status(200).JSON(responseUser)
 }
