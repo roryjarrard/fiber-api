@@ -20,6 +20,7 @@ func setupRoutes(app *fiber.App) {
 	app.Get("/api/users", routes.GetUsers)
 	app.Get("/api/users/:userId", routes.GetUser)
 	app.Put("/api/users/:userId", routes.UpdateUser)
+	app.Delete("/api/users/:userId", routes.DeleteUser)
 }
 
 func main() {
