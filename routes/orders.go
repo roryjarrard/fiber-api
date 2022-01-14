@@ -92,6 +92,21 @@ func GetOrder(c *fiber.Ctx) error {
 	return c.Status(200).JSON(responseOrder)
 }
 
-func UpdateOrder(c *fiber.Ctx) error { return nil }
+func DeleteOrder(c *fiber.Ctx) error {
+	order := models.Order{}
 
-func DeleteOrder(c *fiber.Ctx) error { return nil }
+	id, err := c.ParamsInt("orderId")
+	if err != nil {
+		return c.Status(400).JSON("provide an integer value")
+	}
+
+	if err := findOrder(id, &order); err != nil {
+		return c.Status(404).JSON(err.Error())
+	}
+
+	if err := database.Database.Db.Delete(&order, "id = ?", id).Error; err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
+
+	return c.Status(200).JSON("order deleted successfully")
+}
