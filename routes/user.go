@@ -60,35 +60,30 @@ func findUser(id int, user *models.User) error {
 	return nil
 }
 
-func GetUser(c *fiber.Ctx) error {
+func ensureUserWithId(c *fiber.Ctx, user *models.User) error {
 	id, err := c.ParamsInt("userId")
-
-	var user models.User
 
 	if err != nil {
 		return c.Status(400).JSON("Please ensure that :userId is an integer")
 	}
 
-	if err := findUser(id, &user); err != nil {
+	if err := findUser(id, user); err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
+	return nil
+}
+
+func GetUser(c *fiber.Ctx) error {
+	var user models.User
+	ensureUserWithId(c, &user)
 
 	responseUser := CreateResponseUser(user)
 	return c.Status(200).JSON(responseUser)
 }
 
 func UpdateUser(c *fiber.Ctx) error {
-	id, err := c.ParamsInt("userId")
-
 	var user models.User
-
-	if err != nil {
-		return c.Status(400).JSON("Please ensure that :userId is an integer")
-	}
-
-	if err := findUser(id, &user); err != nil {
-		return c.Status(400).JSON(err.Error())
-	}
+	ensureUserWithId(c, &user)
 
 	type UpdateUser struct {
 		FirstName string `json:"first_name"`
